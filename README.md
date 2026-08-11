@@ -89,7 +89,7 @@ python -u train.py \
   --imb_ratio 100 \
   --exp-dir experiment/CIFAR10 \
   --data_dir ./data \
-  --epochs 800 \
+  --epochs 850 \
   --batch-size 256 \
   --lr 0.01 \
   --wd 1e-3 \
@@ -106,7 +106,7 @@ python -u train.py \
   --imb_ratio 20 \
   --exp-dir experiment/CIFAR100 \
   --data_dir ./data \
-  --epochs 800 \
+  --epochs 850 \
   --batch-size 256 \
   --lr 0.01 \
   --wd 1e-3 \
@@ -167,7 +167,7 @@ Each run creates a configuration-specific directory below `--exp-dir`, for examp
 
 ```text
 experiment/CIFAR10/
-`-- cifar10_p0.5_alpha0.2,0.6_tau2.0_ep800_e50_imb_exp100.0_sd_1/
+`-- cifar10_p0.5_alpha0.2,0.6_tau2.0_ep850_e50_imb_exp100.0_sd_1/
     |-- result.log
     |-- checkpoint.pth.tar
     `-- checkpoint_best_ens.pth.tar
