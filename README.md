@@ -73,7 +73,7 @@ An example directory after the first run is:
 data/
 |-- cifar-10-batches-py/
 `-- pre-processed-data/
-    `-- cifar10_0.3_imb_exp100.0_sd1.npy
+    `-- cifar10_0.5_imb_exp100.0_sd1.npy
 ```
 
 ## Training
@@ -83,64 +83,61 @@ Run commands from the repository root.
 ### CIFAR-10-LT
 
 ```bash
-python train.py \
+python -u train.py \
   --dataset cifar10 \
+  --partial_rate 0.5 \
+  --imb_ratio 100 \
+  --exp-dir experiment/CIFAR10 \
   --data_dir ./data \
-  --exp-dir ./experiment/cifar10 \
   --epochs 800 \
   --batch-size 256 \
   --lr 0.01 \
-  -lr_decay_epochs 700,800 \
-  -lr_decay_rate 0.1 \
-  --partial_rate 0.3 \
-  --imb_type exp \
-  --imb_ratio 100 \
-  --alpha_range 0.2,0.6 \
+  --wd 1e-3 \
   --t 2 \
-  --e 50 \
-  --prot_start 80 \
-  --warmup_epoch_head 80 \
-  --warmup_epoch_tail 100 \
-  --seed 1 \
   --save_ckpt
 ```
 
 ### CIFAR-100-LT
 
 ```bash
-python train.py \
+python -u train.py \
   --dataset cifar100 \
+  --partial_rate 0.05 \
+  --imb_ratio 20 \
+  --exp-dir experiment/CIFAR100 \
   --data_dir ./data \
-  --exp-dir ./experiment/cifar100 \
   --epochs 800 \
   --batch-size 256 \
   --lr 0.01 \
-  -lr_decay_epochs 700,800 \
-  -lr_decay_rate 0.1 \
-  --partial_rate 0.3 \
-  --imb_type exp \
-  --imb_ratio 100 \
-  --alpha_range 0.2,0.6 \
+  --wd 1e-3 \
   --t 2 \
-  --e 50 \
-  --prot_start 80 \
-  --warmup_epoch_head 80 \
-  --warmup_epoch_tail 100 \
-  --seed 1 \
   --save_ckpt
 ```
 
-The commands above expose all important settings explicitly. To run the default CIFAR-10 configuration, the following shorter command is equivalent for the omitted arguments:
+### PASCAL VOC
 
 ```bash
-python train.py --dataset cifar10 --data_dir ./data --save_ckpt
+python -u train.py \
+  --dataset voc \
+  --partial_rate 0 \
+  --imb_ratio 1 \
+  --exp-dir experiment/VOC \
+  --data_dir ./data \
+  --epochs 200 \
+  --batch-size 128 \
+  --lr 0.01 \
+  --wd 1e-3 \
+  --t 0.99 \
+  --save_ckpt
 ```
+
+Arguments not shown in these commands use the defaults defined in `train.py`.
 
 ## Important arguments
 
 | Argument | Default | Description |
 | --- | ---: | --- |
-| `--dataset` | `cifar10` | Dataset name. The end-to-end release path is provided for `cifar10` and `cifar100`. |
+| `--dataset` | `cifar10` | Dataset name. Reproduction configurations are provided for `cifar10`, `cifar100`, and `voc`. |
 | `--data_dir` | `../codes/data/` | Dataset root and location of the generated preprocessing cache. |
 | `--exp-dir` | `experiment/cifar10` | Root directory for logs and checkpoints. |
 | `--epochs` | `800` | Total number of training epochs. |
@@ -169,8 +166,8 @@ python train.py --dataset cifar10 --data_dir ./data --save_ckpt
 Each run creates a configuration-specific directory below `--exp-dir`, for example:
 
 ```text
-experiment/cifar10/
-`-- cifar10_p0.3_alpha0.2,0.6_tau2.0_ep800_e50_imb_exp100.0_sd_1/
+experiment/CIFAR10/
+`-- cifar10_p0.5_alpha0.2,0.6_tau2.0_ep800_e50_imb_exp100.0_sd_1/
     |-- result.log
     |-- checkpoint.pth.tar
     `-- checkpoint_best_ens.pth.tar
@@ -181,8 +178,9 @@ experiment/cifar10/
 ## Current scope and known limitations
 
 - The current training path is GPU-only; CPU execution is not implemented.
-- CIFAR-10 and CIFAR-100 are the end-to-end reproducible datasets in this release.
-- SUN397, PASCAL VOC, and CUB-200 data utilities are included for research use, but the current `train.py` branch initialization and batch interface require adaptation before those datasets can be trained end to end.
+- Reproduction configurations are provided for CIFAR-10, CIFAR-100, and PASCAL VOC.
+- The PASCAL VOC loader expects the CSV and image layout encoded in `utils/voc.py`.
+- SUN397 and CUB-200 data utilities are included for research use, but no official training command is provided here.
 - `--resume` is present in the command-line interface, but the loading keys do not currently match the multi-model checkpoint keys written by `--save_ckpt`; resuming a saved dual-branch run therefore requires a small code adjustment.
 - Pretrained checkpoints and a pinned environment file are not included.
 
